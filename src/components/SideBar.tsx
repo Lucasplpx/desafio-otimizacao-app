@@ -1,4 +1,6 @@
-import { Button } from "./Button";
+import { useMemo } from 'react';
+import { List, ListRowRenderer } from 'react-virtualized';
+import { Button } from './Button';
 
 interface SideBarProps {
   genres: Array<{
@@ -13,24 +15,36 @@ interface SideBarProps {
 export function SideBar({
   genres,
   selectedGenreId,
-  buttonClickCallback
+  buttonClickCallback,
 }: SideBarProps) {
-  return (
-    <nav className="sidebar">
-      <span>Watch<p>Me</p></span>
-
-      <div className="buttons-container">
-        {genres.map(genre => (
-          <Button
-            key={String(genre.id)}
-            title={genre.title}
-            iconName={genre.name}
-            onClick={() => buttonClickCallback(genre.id)}
-            selected={selectedGenreId === genre.id}
-          />
-        ))}
+  const rowRenderer: ListRowRenderer = ({ index, key, style }) => {
+    return (
+      <div key={key} style={style}>
+        <Button
+          title={genres[index].title}
+          iconName={genres[index].name}
+          onClick={() => buttonClickCallback(genres[index].id)}
+          selected={selectedGenreId === genres[index].id}
+        />
       </div>
+    );
+  };
 
+  return (
+    <nav className='sidebar'>
+      <span>
+        Watch<p>Me</p>
+      </span>
+
+      <List
+        className='buttons-container'
+        height={800}
+        rowHeight={80}
+        width={300}
+        overscanRowCount={5}
+        rowCount={genres.length}
+        rowRenderer={rowRenderer}
+      />
     </nav>
-  )
+  );
 }
